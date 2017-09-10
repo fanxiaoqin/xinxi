@@ -1,0 +1,194 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>信息列表</title>
+    <link rel="stylesheet" type="text/css" href="/css/common.css" />
+</head>
+
+<body>
+    <div class="topbar-wrap white">
+        <div class="topbar-inner clearfix">
+            <div class="topbar-logo-wrap clearfix">
+                <ul class="navbar-list clearfix">
+                    <li><a href="/index">首页</a></li>
+                    <li><a class="on" href="info">信息</a></li>
+                    <li><a href="/add">添加</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="container clearfix">
+        <div class="sidebar-wrap">
+            <div class="sidebar-title">
+                <h1>菜单</h1>
+            </div>
+            <div class="sidebar-content">
+                <ul class="sidebar-list">
+                    <li>
+                        <a href="#"><i class="icon-font">&#xe90b;</i>菜单</a>
+                        <ul class="sub-menu">
+                            <li><a href="/index"><i class="icon-font">&#xe90e;</i>主页</a></li>
+                            <li><a href="/info"><i class="icon-font">&#xe90c;</i>信息列表</a></li>
+                            <li><a href="/add"><i class="icon-font">&#xe902;</i>添加信息</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!--/sidebar-->
+        <div class="main-wrap">
+            <div class="crumb-wrap">
+                <div class="crumb-wrap">
+                    <div class="crumb-list"><i class="icon-font">&#xe90e;</i>
+                        </i><a href="/index">首页</a>
+                        <span class="crumb-step">&gt;</span>
+                        <span>信息列表</span>
+                    </div>
+                </div>
+            </div>
+            <div class="search-wrap">
+                <div class="search-content">
+                    <table class="search-tab">
+                        <tr>
+                            <th width="70">关键字:</th>
+                            <td>
+                                <input class="common-text" placeholder="姓名，学号" id="ipt-key" maxlength="20" type="text">
+                            </td>
+                            <td>
+                                <input class="btn btn-primary btn2" onclick="search()" value="查询" type="button">
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="result-wrap">
+                <form name="myform" id="myform" method="post">
+                    <div class="result-content">
+                        <table class="result-tab" width="100%" style="text-align:center">
+                            <thead>
+                                <tr>
+                                    <th>编号</th>
+                                    <th>学号</th>
+                                    <th>班级</th>
+                                    <th>姓名</th>
+                                    <th>性别</th>
+                                    <th>名族</th>
+                                    <th>地址</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-container">
+                                <tr>
+                                    <td>编号</td>
+                                    <td>学号</td>
+                                    <td>班级</td>
+                                    <td>姓名</td>
+                                    <td>性别</td>
+                                    <td>名族</td>
+                                    <td>地址</td>
+                                    <td>
+                                        <a class="link-update" href="edit">修改</a>
+                                        <a class="link-del" href="#">删除</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="list-page" id="list-nav"></div>
+                        <div id="msg"></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!--/main-->
+    </div>
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/layer/layer.js"></script>
+    <script type="text/javascript" src="/js/laypage/laypage.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            document.onkeydown = function(event) {
+                var e = event || window.event || arguments.callee.caller.arguments[0];
+                if (e && e.keyCode == 13) {
+                    search();
+                }
+            };
+            init(1, 10);
+        });
+
+        function search() {
+            init(1, 10);
+        }
+
+        function init(pi, ps) {
+            $('#table-container').html('');
+            var key = $("#ipt-key").val().trim();
+            $.post('info/getpage', {
+                key: key,
+                pi: pi,
+                ps: ps
+            }, function(data) {
+                if (data.status == 1) {
+                    var arrCtn = [];
+                    $.each(data.message.data, function(index, el) {
+                        arrCtn.push('<tr>');
+                        arrCtn.push('<td>' + (index + 1) + '</td>');
+                        arrCtn.push('<td>' + el.num + '</td>');
+                        arrCtn.push('<td>' + el.classs + '</td>');
+                        arrCtn.push('<td>' + el.name + '</td>');
+                        arrCtn.push('<td>' + el.sex + '</td>');
+                        arrCtn.push('<td>' + el.nation + '</td>');
+                        arrCtn.push('<td>' + el.address + '</td>');
+                        arrCtn.push('<td><a class="link-update" href="edit?id=' + el.id + '">修改</a>&nbsp;&nbsp;<a class="link-del" href="javascript:delinfo(' + el.id + ')">删除</a></td>');
+                        arrCtn.push('</tr>');
+                    });
+                    $('#table-container').html(arrCtn.join(''));
+                    laypage({
+                        cont: $('#list-nav'),
+                        pages: Math.ceil(data.message.count / ps),
+                        curr: pi || 1,
+                        skip: true,
+                        jump: function(obj, first) {
+                            document.getElementById('msg').innerHTML = '注：第' + obj.curr + '/' + obj.pages + '页&nbsp;&nbsp;&nbsp;(共' + data.message.count + '条)';
+                            if (!first) {
+                                init(obj.curr, ps);
+                            }
+                        }
+                    });
+                } else {
+                    $('#table-container').html('<tr><td colspan="8">未查询到数据</td></tr>');
+                }
+            }, 'json');
+        }
+
+        function delinfo(id) {
+            layer.confirm('你确定要删除这条数据么?', {
+                offset: '20%'
+            }, function() {
+                var datas = {
+                    id: id
+                }
+                $.post('/info/delinfo', datas, function(data) {
+                    if (data.status == 1) {
+                        layer.msg('删除成功', {
+                            offset: '20%',
+                            icon: 6,
+                            time: 2000
+                        }, function() {
+                            search();
+                        });
+                    } else {
+                        layer.msg('删除失败', {
+                            offset: '20%',
+                            icon: 6,
+                            time: 2000
+                        });
+                    }
+                }, 'json');
+            });
+        }
+    </script>
+</body>
+
+</html>

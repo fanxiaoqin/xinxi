@@ -1,0 +1,222 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>修改信息</title>
+    <link rel="stylesheet" type="text/css" href="/css/common.css" />
+</head>
+
+<body>
+    <div class="topbar-wrap white">
+        <div class="topbar-inner clearfix">
+            <div class="topbar-logo-wrap clearfix">
+                <ul class="navbar-list clearfix">
+                    <li><a href="/index">首页</a></li>
+                    <li><a href="/info">信息</a></li>
+                    <li><a href="/add">添加</a></li>
+                    <li><a class="on" href="javascript:;">修改</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="container clearfix">
+        <div class="sidebar-wrap">
+            <div class="sidebar-title">
+                <h1>菜单</h1>
+            </div>
+            <div class="sidebar-content">
+                <ul class="sidebar-list">
+                    <li>
+                        <a href="#"><i class="icon-font">&#xe90b;</i>菜单</a>
+                        <ul class="sub-menu">
+                            <li><a href="/index"><i class="icon-font">&#xe90e;</i>主页</a></li>
+                            <li><a href="/info"><i class="icon-font">&#xe90c;</i>信息列表</a></li>
+                            <li><a href="/add"><i class="icon-font">&#xe902;</i>添加信息</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!--/sidebar-->
+        <div class="main-wrap">
+            <div class="crumb-wrap">
+                <div class="crumb-list"><i class="icon-font">&#xe90e;</i>
+                    </i><a href="/index">首页</a>
+                    <span class="crumb-step">&gt;</span>
+                    <span>修改信息</span>
+                </div>
+            </div>
+            <div class="result-wrap">
+                <div class="result-content">
+                    <form>
+                        <table class="insert-tab" width="100%">
+                            <tbody>
+                                <tr>
+                                    <th width="120"><i class="require-red">*</i>学号：</th>
+                                    <td>
+                                        <input class="common-text" id="num" style="width:400px" maxlength="50" size="50" type="text" placeholder="请输入学号">
+                                        <input type="hidden" id="hidden-id">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>班级：</th>
+                                    <td>
+                                        <select name="colId" id="classs" class=" common-text">
+                                            <option value="2014级9班">2014级09班</option>
+                                            <option value="2014级10班">2014级10班</option>
+                                            <option value="2013级9班">2013级09班</option>
+                                            <option value="2013级10班">2013级10班</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th><i class="require-red">*</i>姓名：</th>
+                                    <td>
+                                        <input class="common-text" id="name" maxlength="50" size="50" style="width:400px" type="text" placeholder="请输入姓名">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>性别：</th>
+                                    <td>
+                                        <select name="colId" id="sex" class=" common-text">
+                                            <option value="男">男</option>
+                                            <option value="女">女</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>名族：</th>
+                                    <td>
+                                        <input class="common-text" id="nation" maxlength="50" size="50" style="width:400px" type="text">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>地址：</th>
+                                    <td>
+                                        <textarea name="content" id="address" class="common-textarea" id="content" cols="30" style="width: 98%;resize:none" rows="5"></textarea>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <td>
+                                        <input class="btn btn-primary btn6 mr10" value="修改" onclick="updInfo()" type="button">
+                                        <input class="btn btn6" onclick="history.go(-1)" value="返回" type="button">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!--/main-->
+    </div>
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/layer/layer.js"></script>
+    <script type="text/javascript" src="/js/laypage/laypage.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            //queryString 查询字符串 ？开始的内容
+            var qs = window.location.search;
+            //queryStringData 截取子字符串 ？id= 后面的所有东西
+            var qsd = qs.substr(4);
+            //id 把我们需要的数据 转换成 10进制的整数
+            var id = parseInt(qsd, 10);
+            //NaN 转换失败
+            if (isNaN(id)) {
+                //跳转回 信息列表页面
+                window.location.href = "/info";
+            } else { //转换成功
+                //初始化页面数据
+                _init(id);
+            }
+
+        });
+        //查询数据
+        function _init(id) {
+            //$.post('url', {data}, function(data) {}, 'json');
+            $.post('/info/oneinfo', {
+                id: id,
+            }, function(data) {
+                // 还原数据
+                if (data.status == 1) {
+                    //把 json 数据里面的某一个属性值绑定到 html 标签上
+                    $('#hidden-id').val(data.message.id);
+                    $('#num').val(data.message.num);
+                    $('#classs').val(data.message.classs);
+                    $('#name').val(data.message.name);
+                    $('#sex').val(data.message.sex);
+                    $('#nation').val(data.message.nation);
+                    $('#address').val(data.message.address);
+                } else {
+                    //给出错误提示
+                    layer.msg("没有相关信息");
+                }
+            }, 'json');
+        }
+        //修改数据
+        function updInfo() {
+            //获取 id 为 num 元素转换为 jquery 对象
+            var $num = $('#num');
+            //判断学号必须输入 trim 去除前后空格
+            if ($num.val().trim() == '') {
+                //layer 插件提示
+                layer.msg('请输入学号', {
+                    offset: '20%',
+                    icon: 5,
+                    time: 2000
+                });
+                //光标聚集
+                $num.focus();
+                return;
+            }
+            var $classs = $('#classs');
+            var $name = $('#name');
+            //限制必须输入姓名
+            if ($name.val().trim() == '') {
+                layer.msg('请输入姓名', {
+                    offset: '20%',
+                    icon: 5,
+                    time: 2000
+                });
+                $name.focus();
+                return;
+            }
+            var $sex = $('#sex');
+            var $nation = $('#nation');
+            var $address = $('#address');
+            //数据准备
+            var datas = {
+                    id: $('#hidden-id').val(),
+                    num: $num.val().trim(),
+                    classs: $classs.val(),
+                    name: $name.val().trim(),
+                    sex: $sex.val(),
+                    nation: $nation.val().trim(),
+                    address: $address.val().trim()
+                }
+                //向服务器发送数据
+            $.post('/edit/updinfo', datas, function(data) {
+                //状态标识 为2 则表示 操作成功
+                if (data.status == 1) {
+                    layer.msg('修改成功', {
+                        offset: '20%',
+                        icon: 6,
+                        time: 2000
+                    }, function() {
+                        window.location.href = '/info';
+                    });
+                } else { //否则给出错误提示
+                    layer.msg('修改失败', {
+                        offset: '20%',
+                        icon: 2,
+                        time: 2000
+                    });
+                }
+            }, 'json');
+        }
+    </script>
+</body>
+
+</html>

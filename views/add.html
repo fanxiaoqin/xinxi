@@ -1,0 +1,172 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>添加信息</title>
+    <link rel="stylesheet" type="text/css" href="/css/common.css" />
+</head>
+
+<body>
+    <div class="topbar-wrap white">
+        <div class="topbar-inner clearfix">
+            <div class="topbar-logo-wrap clearfix">
+                <ul class="navbar-list clearfix">
+                    <li><a href="/index">首页</a></li>
+                    <li><a href="/info">信息</a></li>
+                    <li><a class="on" href="/add">添加</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="container clearfix">
+        <div class="sidebar-wrap">
+            <div class="sidebar-title">
+                <h1>菜单</h1>
+            </div>
+            <div class="sidebar-content">
+                <ul class="sidebar-list">
+                    <li>
+                        <a href="#"><i class="icon-font">&#xe90b;</i>菜单</a>
+                        <ul class="sub-menu">
+                            <li><a href="/index"><i class="icon-font">&#xe90e;</i>主页</a></li>
+                            <li><a href="/info"><i class="icon-font">&#xe90c;</i>信息列表</a></li>
+                            <li><a href="/add"><i class="icon-font">&#xe902;</i>添加信息</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!--/sidebar-->
+        <div class="main-wrap">
+            <div class="crumb-wrap">
+                <div class="crumb-list"><i class="icon-font">&#xe90e;</i>
+                    </i><a href="/index">首页</a>
+                    <span class="crumb-step">&gt;</span>
+                    <span>添加信息</span>
+                </div>
+            </div>
+            <div class="result-wrap">
+                <div class="result-content">
+                    <form>
+                        <table class="insert-tab" width="100%">
+                            <tbody>
+                                <tr>
+                                    <th width="120"><i class="require-red">*</i>学号：</th>
+                                    <td>
+                                        <input class="common-text" id="num" style="width:400px" maxlength="50" size="50" type="text" placeholder="请输入学号">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>班级：</th>
+                                    <td>
+                                        <select name="colId" id="classs" class=" common-text">
+                                            <option value="2014级9班">2014级09班</option>
+                                            <option value="2014级10班">2014级10班</option>
+                                            <option value="2013级9班">2013级09班</option>
+                                            <option value="2013级10班">2013级10班</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th><i class="require-red">*</i>姓名：</th>
+                                    <td>
+                                        <input class="common-text" id="name" maxlength="50" size="50" style="width:400px" type="text" placeholder="请输入姓名">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>性别：</th>
+                                    <td>
+                                        <select name="colId" id="sex" class=" common-text">
+                                            <option value="男">男</option>
+                                            <option value="女">女</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>名族：</th>
+                                    <td>
+                                        <input class="common-text" id="nation" maxlength="50" size="50" style="width:400px" type="text">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>地址：</th>
+                                    <td>
+                                        <textarea name="content" id="address" class="common-textarea" id="content" cols="30" style="width: 98%;resize:none" rows="5"></textarea>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <td>
+                                        <input class="btn btn-primary btn6 mr10" value="添加" onclick="addInfo()" type="button">
+                                        <input class="btn btn6" onclick="history.go(-1)" value="返回" type="button">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!--/main-->
+    </div>
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/layer/layer.js"></script>
+    <script type="text/javascript" src="/js/laypage/laypage.js"></script>
+    <script type="text/javascript">
+        function addInfo() {
+            var $num = $('#num');
+            if ($num.val().trim() == '') {
+                layer.msg('请输入学号', {
+                    offset: '20%',
+                    icon: 5,
+                    time: 2000
+                });
+                $num.focus();
+                return;
+            }
+            var $classs = $('#classs');
+            var $name = $('#name');
+            if ($name.val().trim() == '') {
+                layer.msg('请输入姓名', {
+                    offset: '20%',
+                    icon: 5,
+                    time: 2000
+                });
+                $name.focus();
+                return;
+            }
+            var $sex = $('#sex');
+            var $nation = $('#nation');
+            var $address = $('#address');
+
+            var datas = {
+                num: $num.val().trim(),
+                classs: $classs.val(),
+                name: $name.val().trim(),
+                sex: $sex.val(),
+                nation: $nation.val().trim(),
+                address: $address.val().trim()
+            }
+            $.post('/add', datas, function(data) {
+                if (data.status == 1) {
+                    layer.msg('添加成功', {
+                        offset: '20%',
+                        icon: 6,
+                        time: 2000
+                    }, function() {
+                        window.location.href = '/info';
+                    });
+                } else {
+                    layer.msg('添加失败', {
+                        offset: '20%',
+                        icon: 6,
+                        time: 2000
+                    });
+                }
+            }, 'json');
+        }
+    </script>
+</body>
+
+</html>
